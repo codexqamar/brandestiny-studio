@@ -10,16 +10,16 @@ const navItems = [
 
 const NavPill = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const pillRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Scroll progress tracker -> horizontal fill
+  // Scroll progress tracker -> CSS variable fill without React re-renders.
   useEffect(() => {
     let rafId = 0;
     let lastProgress = -1;
+    let ticking = false;
 
     const computeProgress = () => {
       const scrollTop = window.scrollY;
@@ -28,27 +28,27 @@ const NavPill = () => {
     };
 
     const update = () => {
+      ticking = false;
       const progress = computeProgress();
       if (Math.abs(progress - lastProgress) > 0.001) {
         lastProgress = progress;
-        setScrollProgress(progress);
+        pillRef.current?.style.setProperty("--nav-scroll-progress", `${progress * 100}%`);
       }
-      rafId = window.requestAnimationFrame(update);
     };
 
     const handleScroll = () => {
-      const progress = computeProgress();
-      lastProgress = progress;
-      setScrollProgress(progress);
+      if (!ticking) {
+        ticking = true;
+        rafId = window.requestAnimationFrame(update);
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    rafId = window.requestAnimationFrame(update);
+    update();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.cancelAnimationFrame(rafId);
+      if (rafId) window.cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -158,10 +158,10 @@ const NavPill = () => {
           <div
             className="absolute inset-y-0 left-0"
             style={{
-              width: `${scrollProgress * 100}%`,
+              width: "var(--nav-scroll-progress, 0%)",
               backgroundColor: "rgba(255, 255, 255, 0.16)",
               borderRadius: "inherit",
-              transition: "width 0.1s ease-out",
+              transition: "width 0.08s linear",
             }}
           />
         </div>
@@ -189,7 +189,7 @@ const NavPill = () => {
               e.stopPropagation();
               handleNavClick("/");
             }}
-            className="select-none whitespace-nowrap"
+            className="relative select-none whitespace-nowrap"
             style={{
               fontFamily: "'HelveticaNeue Ext', sans-serif",
               fontSize: 16, // Adjusted slightly since extended fonts tend to render larger
@@ -197,12 +197,24 @@ const NavPill = () => {
               letterSpacing: "0.01em", // Extended fonts usually benefit from tighter kerning
               textTransform: "uppercase",
               color: "#ffffff",
-              display: "flex",
+              display: "inline-flex",
               alignItems: "center",
               transform: "translateY(1px)", // Perfect visual alignment center
             }}
           >
-            <span style={{ color: "#fde3c6", marginRight: "1px" }}>BR</span>ANDESTINY
+            <span aria-hidden="true">BRANDESTINY</span>
+            <span
+              aria-hidden="true"
+              className="absolute inset-y-0 left-0 overflow-hidden"
+              style={{
+                width: "var(--nav-scroll-progress, 0%)",
+                color: "#fde3c6",
+                transition: "width 0.08s linear",
+              }}
+            >
+              BRANDESTINY
+            </span>
+            <span className="sr-only">BRANDESTINY</span>
           </span>
 
           {/* ── Animated dots toggle — grouped perfectly right ── */}

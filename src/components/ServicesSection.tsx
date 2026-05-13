@@ -1,39 +1,114 @@
-import { motion } from "framer-motion";
-import { useRef } from "react";
-import project2 from "@/assets/project-2.png";
+import { type ReactNode } from "react";
+import brandIdentityVideo from "@/assets/Brand Identity Creation Section.mp4";
+import devopsVideo from "@/assets/Devops Section.mp4";
+import erpVideo from "@/assets/ERP Section.mp4";
+import seoVideo from "@/assets/For SEO Section.mp4";
+import mobileAppVideo from "@/assets/Mobile App Section.mp4";
+import saasVideo from "@/assets/SAAS Section.mp4";
+import socialMediaVideo from "@/assets/Social Media Management Section.mp4";
+import webAppVideo from "@/assets/Web App Development.mp4";
+import websiteVideo from "@/assets/Website Design and Development Section.mp4";
+
+type ServiceCardProps = {
+  title: ReactNode;
+  videoSrc: string;
+  showDivider?: boolean;
+};
+
+const ServiceCard = ({
+  title,
+  videoSrc,
+  showDivider = true,
+}: ServiceCardProps) => {
+  return (
+    <div className="relative group p-8 md:p-12 aspect-square md:aspect-auto md:h-[400px] border-b border-white/10 overflow-hidden flex flex-col justify-between">
+      <video
+        src={videoSrc}
+        className="absolute inset-0 w-full h-full object-cover opacity-60 transition duration-500 group-hover:opacity-80 group-hover:scale-105"
+        autoPlay
+        muted
+        loop
+        playsInline
+      />
+
+      <div className="absolute inset-0 bg-black/40 transition-colors duration-500 group-hover:bg-black/25" />
+
+      <div className="relative z-10">
+        <div className="w-5 h-5 rounded-full border border-white/30 transition-all duration-500 group-hover:scale-125 group-hover:border-white group-hover:bg-white" />
+      </div>
+
+      <h3 className="relative z-10 font-display text-white text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1]">
+        {title}
+      </h3>
+
+      {showDivider && (
+        <div className="hidden md:block absolute top-0 right-0 w-[1px] h-full bg-white/10" />
+      )}
+    </div>
+  );
+};
+
+const services = [
+  {
+    title: (
+      <>
+        Web Design & <br /> Development
+      </>
+    ),
+    videoSrc: websiteVideo,
+  },
+  {
+    title: "Mobile Apps",
+    videoSrc: mobileAppVideo,
+  },
+  {
+    title: "Web Apps",
+    videoSrc: webAppVideo,
+  },
+  {
+    title: "ERP",
+    videoSrc: erpVideo,
+  },
+  {
+    title: "DevOps",
+    videoSrc: devopsVideo,
+  },
+  {
+    title: "SEO",
+    videoSrc: seoVideo,
+  },
+  {
+    title: "SAAS",
+    videoSrc: saasVideo,
+  },
+  {
+    title: (
+      <>
+        Social Media <br /> Management
+      </>
+    ),
+    videoSrc: socialMediaVideo,
+  },
+];
 
 const ServicesSection = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  const handleMouseEnter = () => {
-    if (videoRef.current) {
-      videoRef.current.play();
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  };
-
   return (
     <section id="services" className="w-full bg-black">
       <div className="grid grid-cols-1 md:grid-cols-3 border-t border-white/10">
-        {/* Row 1, Col 1: Brand Identity Creation */}
-        <div className="relative group p-8 md:p-12 aspect-square md:aspect-auto md:h-[400px] border-b border-white/10 md:border-right border-white/10 flex flex-col justify-between">
-          <div className="w-5 h-5 rounded-full border border-white/30" />
-          <h3 className="font-display text-white text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1]">
-            Brand Identity <br /> Creation
-          </h3>
-          {/* Vertical line for desktop */}
-          <div className="hidden md:block absolute top-0 right-0 w-[1px] h-full bg-white/10" />
+        <div className="order-2 lg:order-1">
+          <ServiceCard
+            title={
+              <>
+                Brand Identity <br /> Creation
+              </>
+            }
+            videoSrc={brandIdentityVideo}
+          />
         </div>
 
         {/* Row 1, Col 2-3: Key Services */}
-        <div className="md:col-span-2 p-8 md:p-12 border-b border-white/10 flex flex-col justify-between h-[300px] md:h-auto">
-          <h2 className="font-display text-white text-3xl md:text-4xl font-bold">
+        <div className="order-1 lg:order-2 md:col-span-2 p-8 md:p-12 border-b border-white/10 flex flex-col justify-start gap-8 md:gap-10 h-[300px] md:h-auto">
+          <h2 className="font-display text-white text-4xl md:text-5xl lg:text-6xl font-bold">
             Key Services
           </h2>
           <div className="max-w-md">
@@ -44,59 +119,15 @@ const ServicesSection = () => {
           </div>
         </div>
 
-        {/* Row 2, Col 1: Web Design & Development */}
-        <div className="relative p-8 md:p-12 aspect-square md:aspect-auto md:h-[400px] border-b border-white/10 flex flex-col justify-between">
-          <div className="w-5 h-5 rounded-full border border-white/30" />
-          <h3 className="font-display text-white text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1]">
-            Web Design & <br /> Development
-          </h3>
-          {/* Vertical line for desktop */}
-          <div className="hidden md:block absolute top-0 right-0 w-[1px] h-full bg-white/10" />
-        </div>
-
-        {/* Row 2, Col 2: Mobile Apps (With Video on Hover) */}
-        <div 
-          className="relative group p-8 md:p-12 aspect-square md:aspect-auto md:h-[400px] border-b border-white/10 overflow-hidden flex flex-col justify-between"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          {/* Background Image (Fallback) */}
-          <img 
-            src={project2} 
-            alt="Mobile Apps" 
-            className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-0 transition-opacity duration-500"
-          />
-          
-          {/* Background Video */}
-          <video
-            ref={videoRef}
-            src="/Homepage_Sable.mp4"
-            className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-60 transition-opacity duration-500"
-            muted
-            loop
-            playsInline
-          />
-
-          <div className="absolute inset-0 bg-black/40" />
-          
-          <div className="relative z-10">
-            <div className="w-5 h-5 rounded-full bg-white" />
+        {services.map((service, index) => (
+          <div key={index} className="order-3">
+            <ServiceCard
+              title={service.title}
+              videoSrc={service.videoSrc}
+              showDivider={index % 3 !== 2}
+            />
           </div>
-          
-          <h3 className="relative z-10 font-display text-white text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1]">
-            Mobile Apps
-          </h3>
-          {/* Vertical line for desktop */}
-          <div className="hidden md:block absolute top-0 right-0 w-[1px] h-full bg-white/10" />
-        </div>
-
-        {/* Row 2, Col 3: Web Apps */}
-        <div className="p-8 md:p-12 aspect-square md:aspect-auto md:h-[400px] border-b border-white/10 flex flex-col justify-between">
-          <div className="w-5 h-5 rounded-full border border-white/30" />
-          <h3 className="font-display text-white text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1]">
-            Web Apps
-          </h3>
-        </div>
+        ))}
       </div>
     </section>
   );
