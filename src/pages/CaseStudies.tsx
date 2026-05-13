@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, X } from "lucide-react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
@@ -22,63 +22,106 @@ const caseStudyAssets = import.meta.glob(
 
 const metadata: Record<
   string,
-  { title: string; category: string; summary: string; nda?: boolean }
+  {
+    title: string;
+    cardTitle: string;
+    category: string;
+    summary: string;
+    cardSummary: string;
+    services: string[];
+    nda?: boolean;
+  }
 > = {
   "CRM ERP": {
-    title: "CRM ERP Systems",
-    category: "ERP / CRM",
+    title: "Custom CRM and ERP Software Development",
+    cardTitle: "CRM ERP Systems",
+    category: "CRM / ERP Development",
     summary:
-      "Operational platforms shaped around dashboards, pipelines, reporting, and the daily workflows teams repeat most.",
+      "Custom CRM and ERP software interfaces shaped around dashboards, lead pipelines, reporting, role-based workflows, and the operational tools teams rely on every day.",
+    cardSummary:
+      "Scalable CRM and ERP dashboard design for sales pipelines, analytics, admin workflows, and business process automation.",
+    services: ["CRM Software", "ERP Systems", "Dashboard UX", "Workflow Automation"],
   },
   "Devops Portfolio": {
-    title: "DevOps Portfolio",
-    category: "DevOps",
+    title: "DevOps Automation and Cloud Infrastructure",
+    cardTitle: "DevOps Automation",
+    category: "DevOps / Cloud",
     summary:
-      "Infrastructure, automation, deployment interfaces, and technical systems presented with clarity and motion.",
+      "DevOps portfolio work covering cloud infrastructure, CI/CD automation, deployment workflows, monitoring interfaces, and technical product storytelling for engineering-led brands.",
+    cardSummary:
+      "Cloud DevOps, CI/CD pipelines, deployment automation, monitoring systems, and infrastructure presentation design.",
+    services: ["DevOps", "CI/CD", "Cloud Infrastructure", "Automation"],
   },
   "Logo Designs Portfolio": {
-    title: "Logo Design Portfolio",
+    title: "Logo Design and Brand Identity Systems",
+    cardTitle: "Logo & Brand Identity",
     category: "Brand Identity",
     summary:
-      "A broad identity collection focused on memorable marks, flexible systems, and visual range across industries.",
+      "A brand identity and logo design portfolio focused on memorable marks, flexible visual systems, and industry-specific identity directions for digital-first businesses.",
+    cardSummary:
+      "Logo design, brand marks, identity systems, visual direction, and scalable brand assets for modern companies.",
+    services: ["Logo Design", "Brand Identity", "Visual Systems", "Brand Strategy"],
   },
   "Mobile App Portfolio": {
-    title: "Mobile App Portfolio",
-    category: "Mobile Apps",
+    title: "Mobile App UI UX Design and Development",
+    cardTitle: "Mobile App UI UX",
+    category: "Mobile App Design",
     summary:
-      "Mobile product interfaces built for quick scanning, sharp flows, and polished moments of interaction.",
+      "Mobile app design work built around clear product flows, user onboarding, app dashboards, native interaction patterns, and polished interface systems for iOS and Android experiences.",
+    cardSummary:
+      "Mobile app UI UX for onboarding, dashboards, booking flows, fintech, logistics, travel, and product-led apps.",
+    services: ["Mobile App UI", "UX Design", "iOS / Android", "Product Flows"],
   },
   "Product Design Portfolio": {
-    title: "Product Design Portfolio",
+    title: "Digital Product Design and Launch Visuals",
+    cardTitle: "Product Design",
     category: "Product Design",
     summary:
-      "Product visuals, launch imagery, and interface-led presentation systems built for high-impact inspection.",
+      "Product design visuals and launch assets for digital products, consumer goods, 3D product storytelling, packaging-style compositions, and high-impact commercial presentation.",
+    cardSummary:
+      "Product design visuals, 3D product content, launch campaigns, packaging concepts, and conversion-focused imagery.",
+    services: ["Product Design", "3D Visuals", "Launch Assets", "Commercial Design"],
   },
   "Social Media Management Portfolio": {
-    title: "Social Media Management",
-    category: "Social Media",
+    title: "Social Media Management and Campaign Design",
+    cardTitle: "Social Media Campaigns",
+    category: "Social Media Marketing",
     summary:
-      "Campaign-ready social assets designed for recognisable rhythm, repeatable formats, and strong brand recall.",
+      "Social media management portfolio work built for campaign consistency, content calendars, branded post systems, visual storytelling, and stronger brand recall across digital channels.",
+    cardSummary:
+      "Social media campaign design, branded content systems, post templates, engagement assets, and digital marketing visuals.",
+    services: ["Social Media", "Campaign Design", "Content Strategy", "Brand Recall"],
   },
   "Web App Section": {
-    title: "Web App Development",
-    category: "Web Apps",
+    title: "SaaS and Web App Development",
+    cardTitle: "SaaS Web Apps",
+    category: "Web App Development",
     summary:
-      "Web application experiences that balance dense product functionality with calm, usable interface structure.",
+      "Web app and SaaS interface work balancing dense product functionality with clean UX, dashboards, subscription flows, admin tools, and responsive application design.",
+    cardSummary:
+      "SaaS web app design and development for dashboards, product workflows, admin panels, and scalable interfaces.",
+    services: ["SaaS Design", "Web Apps", "Dashboard UI", "Frontend Development"],
   },
   "Website Portfolio": {
-    title: "Website Portfolio",
+    title: "Website Design and Development Portfolio",
+    cardTitle: "Website Design",
     category: "Website Design",
     summary:
-      "A collection of websites using motion, composition, and product-led visuals to create memorable digital presence.",
+      "Website design and development portfolio work using responsive layouts, motion, brand storytelling, conversion-focused sections, and product-led visuals for stronger online presence.",
+    cardSummary:
+      "Responsive website design, landing pages, motion-driven web development, brand websites, and conversion-focused UI.",
+    services: ["Website Design", "Web Development", "Landing Pages", "Responsive UI"],
   },
 };
 
 type CaseStudy = {
   id: string;
   title: string;
+  cardTitle: string;
   category: string;
   summary: string;
+  cardSummary: string;
+  services: string[];
   nda?: boolean;
   videos: string[];
   images: string[];
@@ -120,9 +163,13 @@ const buildCaseStudies = (): CaseStudy[] => {
     .map(([folder, assets]) => {
       const copy = metadata[folder] || {
         title: folder,
+        cardTitle: folder,
         category: "Case Study",
         summary:
           "A selected body of work arranged as an immersive case-study sequence.",
+        cardSummary:
+          "Digital case study covering strategy, interface design, visual direction, responsive execution, and launch-ready presentation.",
+        services: ["Digital Strategy", "UI UX", "Development", "Creative Direction"],
       };
 
       return {
@@ -163,6 +210,29 @@ const CaseStudies = () => {
   );
 
   const caseStudies = useMemo(() => buildCaseStudies(), []);
+
+  useEffect(() => {
+    const title = selectedStudy
+      ? `${selectedStudy.title} | Brandestiny Case Study`
+      : "Case Studies | Website, App, Brand, CRM, ERP and DevOps Portfolio | Brandestiny";
+    const description =
+      selectedStudy?.summary ||
+      "Explore Brandestiny case studies across website design, web app development, mobile app UI UX, CRM ERP software, DevOps automation, brand identity, product design, and social media campaigns.";
+
+    document.title = title;
+
+    let metaDescription = document.querySelector<HTMLMetaElement>(
+      'meta[name="description"]',
+    );
+
+    if (!metaDescription) {
+      metaDescription = document.createElement("meta");
+      metaDescription.name = "description";
+      document.head.appendChild(metaDescription);
+    }
+
+    metaDescription.content = description;
+  }, [selectedStudy]);
 
   useGSAP(
     () => {
@@ -408,12 +478,33 @@ const CaseStudies = () => {
 
                       <div className="absolute bottom-6 left-6 right-6 md:bottom-10 md:left-10 md:right-10">
                         <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-2 md:mb-3 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                          {study.title}
+                          {study.cardTitle}
                         </h3>
                         <div className="h-[1px] w-0 group-hover:w-full bg-white/30 transition-all duration-700 mb-3 md:mb-4" />
                         <p className="text-gray-400 text-[10px] md:text-xs lg:text-sm uppercase tracking-[0.2em] font-medium">
                           {study.category}
                         </p>
+                        <p
+                          className="mt-3 text-white/55 text-xs md:text-sm leading-relaxed max-w-[92%]"
+                          style={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                          }}
+                        >
+                          {study.cardSummary}
+                        </p>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {study.services.slice(0, 3).map((service) => (
+                            <span
+                              key={service}
+                              className="rounded-full border border-white/15 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-[0.14em] text-white/60"
+                            >
+                              {service}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </motion.button>
                   );
@@ -488,9 +579,13 @@ const CaseStudies = () => {
                           {getMediaTitle(selectedStudy, index)}
                         </h2>
                         <p className="max-w-md text-white/55 text-base md:text-lg leading-relaxed">
-                          {selectedStudy.category} work shown through a focused
-                          frame: layout, motion, visual hierarchy, and the final
-                          experience working together as one system.
+                          {selectedStudy.cardSummary} This section highlights
+                          {` ${selectedStudy.services
+                            .slice(0, 3)
+                            .join(", ")
+                            .toLowerCase()} `}
+                          through layout, motion, visual hierarchy, and
+                          responsive execution.
                         </p>
                       </div>
 
