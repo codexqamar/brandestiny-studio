@@ -5,23 +5,96 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link } from "react-router-dom";
 
-import project1 from "@/assets/project-1.png";
-import project2 from "@/assets/project-2.png";
-import project3 from "@/assets/project-3.png";
-import project4 from "@/assets/project-4.png";
-import project5 from "@/assets/project-5.png";
-import project6 from "@/assets/project-6.png";
-
 gsap.registerPlugin(ScrollTrigger);
 
-const projects = [
-  { id: 1, image: project1, name: "BRANT", year: "2025", tags: ["Art Direction", "Website Design", "Brand", "Development"] },
-  { id: 2, image: project2, name: "MONOLITH", year: "2025", tags: ["3D Modeling", "UX/UI Design", "Brand Strategy"] },
-  { id: 3, image: project3, name: "SABLE", year: "2025", tags: ["Mobile App", "Brand Identity", "Development"] },
-  { id: 4, image: project4, name: "SEEN", year: "2025", tags: ["Art Direction", "Web Design", "3D Animation"] },
-  { id: 5, image: project5, name: "GLOW", year: "2024", tags: ["Campaign", "Advertising"] },
-  { id: 6, image: project6, name: "TECH", year: "2024", tags: ["3D", "Motion", "Development"] },
-];
+const caseStudyAssets = import.meta.glob(
+  "/src/case studies/**/*.{jpg,jpeg,png,mp4}",
+  {
+    eager: true,
+    query: "?url",
+    import: "default",
+  },
+) as Record<string, string>;
+
+const projectMetadata: Record<string, { name: string; tags: string[] }> = {
+  "CRM ERP": {
+    name: "CRM ERP",
+    tags: ["ERP", "CRM", "Dashboard", "Workflow Systems"],
+  },
+  "Devops Portfolio": {
+    name: "DEVOPS",
+    tags: ["DevOps", "Infrastructure", "Automation", "Cloud"],
+  },
+  "Logo Designs Portfolio": {
+    name: "LOGO DESIGN",
+    tags: ["Brand Identity", "Logo Systems", "Visual Design"],
+  },
+  "Mobile App Portfolio": {
+    name: "MOBILE APP",
+    tags: ["Mobile App", "UX/UI Design", "Product Design"],
+  },
+  "Product Design Portfolio": {
+    name: "PRODUCT DESIGN",
+    tags: ["Product Design", "3D Visuals", "Launch Assets"],
+  },
+  "Social Media Management Portfolio": {
+    name: "SOCIAL MEDIA",
+    tags: ["Social Media", "Campaigns", "Content Systems"],
+  },
+  "Web App Section": {
+    name: "WEB APP",
+    tags: ["Web App", "SaaS", "Interface Design", "Development"],
+  },
+  "Website Portfolio": {
+    name: "WEBSITE",
+    tags: ["Website Design", "Development", "Motion"],
+  },
+};
+
+const projectOrder = Object.keys(projectMetadata);
+
+const projects = Object.entries(caseStudyAssets).reduce<
+  Array<{
+    id: string;
+    name: string;
+    year: string;
+    tags: string[];
+    video?: string;
+    image?: string;
+  }>
+>((acc, [path, url]) => {
+  const folder = path.split("/case studies/")[1]?.split("/")[0];
+  if (!folder || folder === "Somewhere in About US Page") return acc;
+
+  const existing = acc.find((project) => project.id === folder);
+  const project =
+    existing ||
+    ({
+      id: folder,
+      name: projectMetadata[folder]?.name || folder.toUpperCase(),
+      year: "2026",
+      tags: projectMetadata[folder]?.tags || ["Case Study", "Digital Product"],
+    } as {
+      id: string;
+      name: string;
+      year: string;
+      tags: string[];
+      video?: string;
+      image?: string;
+    });
+
+  if (path.toLowerCase().endsWith(".mp4") && !project.video) {
+    project.video = url;
+  }
+
+  if (!path.toLowerCase().endsWith(".mp4") && !project.image) {
+    project.image = url;
+  }
+
+  if (!existing) acc.push(project);
+
+  return acc;
+}, []).sort((a, b) => projectOrder.indexOf(a.id) - projectOrder.indexOf(b.id));
 
 const FeaturedProjects = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -60,15 +133,27 @@ const FeaturedProjects = () => {
                 </span>
               </div>
 
-              {/* Project Image Container */}
+              {/* Project Media Container */}
               <div className="relative aspect-square bg-[#0c0c0c] overflow-hidden mb-6 rounded-sm">
-                <img
-                  src={project.image}
-                  alt={project.name}
-                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-[1.05] transition-all duration-1000 ease-out"
-                  loading="lazy"
-                />
-                <Link to={`/case-studies/${project.id}`} className="absolute inset-0 z-10" />
+                {project.video ? (
+                  <video
+                    src={project.video}
+                    poster={project.image}
+                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-[1.05] transition-all duration-1000 ease-out"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                ) : (
+                  <img
+                    src={project.image}
+                    alt={project.name}
+                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-[1.05] transition-all duration-1000 ease-out"
+                    loading="lazy"
+                  />
+                )}
+                <Link to="/case-studies" className="absolute inset-0 z-10" />
               </div>
 
               {/* Tags / Categories List */}
@@ -92,7 +177,7 @@ const FeaturedProjects = () => {
                 Featured <br /> Projects
               </h2>
               <span className="font-display text-white/20 text-6xl md:text-7xl lg:text-8xl font-bold leading-none">
-                11
+                {projects.length}
               </span>
             </div>
 
@@ -105,7 +190,7 @@ const FeaturedProjects = () => {
                 View All
               </span>
               <span className="text-[12px] font-medium opacity-60 z-10 group-hover:opacity-100 transition-opacity">
-                44
+                {projects.length}
               </span>
               <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             </Link>

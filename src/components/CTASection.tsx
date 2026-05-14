@@ -54,7 +54,7 @@ const CTASection = () => {
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} id="contact" className="w-full relative overflow-hidden px-6 md:px-10 py-24 md:py-36" style={{ background: "var(--black-2)" }}>
+    <section ref={containerRef} id="contact" className="w-full relative overflow-hidden px-6 md:px-10 pt-24 pb-10 md:pt-36 md:pb-14" style={{ background: "var(--black-2)" }}>
       
       {/* Background Visuals that Blur on Scroll */}
       <motion.div 
@@ -114,36 +114,6 @@ const CTASection = () => {
           </button>
         </motion.div>
       </div>
-
-      {/* Marquee brand strip */}
-      <motion.div
-        className="mt-24 md:mt-36 overflow-hidden"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-      >
-        <div className="marquee-track">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center gap-8 mx-8 flex-shrink-0">
-              <span
-                className="font-display text-white/[0.06] font-bold whitespace-nowrap tracking-tight"
-                style={{ fontSize: "clamp(4rem, 8vw, 8rem)" }}
-              >
-                BRANDESTINY
-              </span>
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center flex-shrink-0" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
-                <motion.span
-                  className="text-[8px] md:text-[10px] font-grotesk text-white/30 uppercase tracking-[0.2em]"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                >
-                  ✦
-                </motion.span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.div>
     </section>
   );
 };

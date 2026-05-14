@@ -1,54 +1,81 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
+import brandestinyLogo from "@/assets/brandestiny-footer-logo.png";
 
 const navItems = [
   { label: "HOME", number: "01", href: "/" },
   { label: "CASE STUDIES", number: "02", href: "/case-studies" },
-  { label: "LET'S CONNECT", number: "03", href: "/lets-connect" },
+  { label: "BLOG", number: "03", href: "/blog" },
+  { label: "LET'S CONNECT", number: "04", href: "/lets-connect" },
 ];
 
 const NavPill = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const pillRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollSourceRef = useRef<HTMLElement | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Scroll progress tracker -> horizontal fill
+  // Scroll progress tracker -> CSS variable fill without React re-renders.
   useEffect(() => {
     let rafId = 0;
     let lastProgress = -1;
+    let ticking = false;
+    let activeScrollTarget: Window | HTMLElement = window;
 
     const computeProgress = () => {
+      const scrollSource = scrollSourceRef.current;
+
+      if (scrollSource) {
+        const scrollableHeight = scrollSource.scrollHeight - scrollSource.clientHeight;
+        return scrollableHeight > 0 ? Math.min(scrollSource.scrollTop / scrollableHeight, 1) : 0;
+      }
+
       const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      return docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
+      const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+      return scrollableHeight > 0 ? Math.min(scrollTop / scrollableHeight, 1) : 0;
     };
 
     const update = () => {
+      ticking = false;
       const progress = computeProgress();
       if (Math.abs(progress - lastProgress) > 0.001) {
         lastProgress = progress;
-        setScrollProgress(progress);
+        pillRef.current?.style.setProperty("--nav-scroll-progress", `${progress * 100}%`);
       }
-      rafId = window.requestAnimationFrame(update);
     };
 
     const handleScroll = () => {
-      const progress = computeProgress();
-      lastProgress = progress;
-      setScrollProgress(progress);
+      if (!ticking) {
+        ticking = true;
+        rafId = window.requestAnimationFrame(update);
+      }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    rafId = window.requestAnimationFrame(update);
+    const bindScrollTarget = (target: Window | HTMLElement) => {
+      activeScrollTarget.removeEventListener("scroll", handleScroll);
+      activeScrollTarget = target;
+      activeScrollTarget.addEventListener("scroll", handleScroll, { passive: true });
+    };
+
+    const handleScrollSourceChange = (event: Event) => {
+      const source = (event as CustomEvent<{ source: HTMLElement | null }>).detail?.source ?? null;
+      scrollSourceRef.current = source;
+      bindScrollTarget(source ?? window);
+      lastProgress = -1;
+      update();
+    };
+
+    window.addEventListener("brandestiny:nav-scroll-source", handleScrollSourceChange);
+    bindScrollTarget(window);
+    update();
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.cancelAnimationFrame(rafId);
+      activeScrollTarget.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("brandestiny:nav-scroll-source", handleScrollSourceChange);
+      if (rafId) window.cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -158,10 +185,10 @@ const NavPill = () => {
           <div
             className="absolute inset-y-0 left-0"
             style={{
-              width: `${scrollProgress * 100}%`,
+              width: "var(--nav-scroll-progress, 0%)",
               backgroundColor: "rgba(255, 255, 255, 0.16)",
               borderRadius: "inherit",
-              transition: "width 0.1s ease-out",
+              transition: "width 0.08s linear",
             }}
           />
         </div>
@@ -189,7 +216,7 @@ const NavPill = () => {
               e.stopPropagation();
               handleNavClick("/");
             }}
-            className="select-none whitespace-nowrap"
+            className="relative select-none whitespace-nowrap"
             style={{
               fontFamily: "'HelveticaNeue Ext', sans-serif",
               fontSize: 16, // Adjusted slightly since extended fonts tend to render larger
@@ -197,12 +224,24 @@ const NavPill = () => {
               letterSpacing: "0.01em", // Extended fonts usually benefit from tighter kerning
               textTransform: "uppercase",
               color: "#ffffff",
-              display: "flex",
+              display: "inline-flex",
               alignItems: "center",
               transform: "translateY(1px)", // Perfect visual alignment center
             }}
           >
-            <span style={{ color: "#fde3c6", marginRight: "1px" }}>BR</span>ANDESTINY
+            <span aria-hidden="true">BRANDESTINY</span>
+            <span
+              aria-hidden="true"
+              className="absolute inset-y-0 left-0 overflow-hidden"
+              style={{
+                width: "var(--nav-scroll-progress, 0%)",
+                color: "#fde3c6",
+                transition: "width 0.08s linear",
+              }}
+            >
+              BRANDESTINY
+            </span>
+            <span className="sr-only">BRANDESTINY</span>
           </span>
 
           {/* ── Animated dots toggle — grouped perfectly right ── */}
@@ -283,24 +322,29 @@ const NavPill = () => {
                 ))}
               </div>
 
-              {/* CTA at bottom */}
+              {/* Brand mark at bottom */}
               <motion.div
-                className="mt-auto pt-10"
+                className="mt-auto pt-10 flex flex-col items-start gap-3"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.4 }}
               >
-                <button
-                  onClick={() => handleNavClick("/lets-connect")}
-                  className="group flex items-center gap-[10px] relative cursor-pointer text-left w-fit interactive"
+                <img
+                  src={brandestinyLogo}
+                  alt="Brandestiny"
+                  className="h-16 w-16 object-contain opacity-90"
+                />
+                <p
+                  className="text-white/35 uppercase"
+                  style={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: 10,
+                    fontWeight: 600,
+                    letterSpacing: "0.18em",
+                  }}
                 >
-                  <span
-                    className="text-white leading-[1] uppercase"
-                    style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 34, fontWeight: 600 }}
-                  >
-                    Let's Connect
-                  </span>
-                </button>
+                  Copyright Brandestiny
+                </p>
               </motion.div>
             </motion.div>
           )}

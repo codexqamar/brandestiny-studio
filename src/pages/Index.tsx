@@ -9,7 +9,6 @@ import OurStory from "@/components/OurStory";
 import HowWeWork from "@/components/HowWeWork";
 import Testimonials from "@/components/Testimonials";
 import CTASection from "@/components/CTASection";
-import NextPageBar from "@/components/NextPageBar";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -26,7 +25,6 @@ const Index = () => {
         <HowWeWork />
         <Testimonials />
         <CTASection />
-        <NextPageBar />
         <Footer />
       </div>
     </SmoothScroll>
