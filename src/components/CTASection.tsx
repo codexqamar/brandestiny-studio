@@ -8,18 +8,24 @@ import { useNavigate } from "react-router-dom";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const services = ["WEBSITE", "MOBILE APP", "WEB APP", "BRAND", "SOCIAL MEDIA"];
+const services = [
+  { label: "WEBSITE", targetId: "service-website-design" },
+  { label: "MOBILE APP", targetId: "service-mobile-apps" },
+  { label: "WEB APP", targetId: "service-web-apps" },
+  { label: "BRAND", targetId: "service-brand-identity" },
+  { label: "SOCIAL MEDIA", targetId: "service-social-media" },
+];
 
 const CTASection = () => {
   const navigate = useNavigate();
   const containerRef = useRef<HTMLElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
-  const servicesRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const servicesRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useGSAP(() => {
     if (!containerRef.current) return;
 
-    const items = servicesRefs.current.filter((el): el is HTMLSpanElement => Boolean(el));
+    const items = servicesRefs.current.filter((el): el is HTMLButtonElement => Boolean(el));
     if (items.length === 0) return;
 
     gsap.set(items, { opacity: 0.18, filter: "blur(16px)" });
@@ -78,14 +84,17 @@ const CTASection = () => {
 
         <div className="flex flex-col items-center mb-14">
           {services.map((service, i) => (
-            <span
-              key={service}
+            <button
+              type="button"
+              key={service.label}
               ref={(el) => { servicesRefs.current[i] = el; }}
-              className="font-display text-white font-bold leading-[1.1] tracking-tight"
+              onClick={() => navigate(`/services#${service.targetId}`)}
+              className="interactive font-display text-white font-bold leading-[1.1] tracking-tight focus-visible:outline-none"
               style={{ fontSize: "clamp(2.5rem, 6vw, 6.5rem)" }}
+              aria-label={`View ${service.label.toLowerCase()} service`}
             >
-              {service}
-            </span>
+              {service.label}
+            </button>
           ))}
         </div>
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import CustomCursor from "@/components/CustomCursor";
 import NavPill from "@/components/NavPill";
 import Footer from "@/components/Footer";
@@ -10,6 +10,7 @@ import { services, type ServiceItem } from "@/data/services";
 
 const Services = () => {
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
+  const location = useLocation();
 
   useEffect(() => {
     document.title = "Services | Brandestiny";
@@ -27,6 +28,17 @@ const Services = () => {
     metaDescription.content =
       "Explore Brandestiny services across brand identity, website design, web app development, mobile apps, CRM ERP systems, DevOps, SEO, SaaS, and social media management.";
   }, []);
+
+  useEffect(() => {
+    if (!location.hash) return;
+
+    const targetId = location.hash.slice(1);
+    const scrollTimer = window.setTimeout(() => {
+      document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+
+    return () => window.clearTimeout(scrollTimer);
+  }, [location.hash]);
 
   return (
     <SmoothScroll>
@@ -57,7 +69,7 @@ const Services = () => {
                 <article
                   key={service.id}
                   id={service.id}
-                  className="grid min-h-[78vh] grid-cols-1 border-b border-white/10 lg:grid-cols-2"
+                  className="grid min-h-[78vh] scroll-mt-24 grid-cols-1 border-b border-white/10 lg:grid-cols-2"
                 >
                   <button
                     type="button"

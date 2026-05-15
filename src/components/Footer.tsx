@@ -13,6 +13,7 @@ const navLinks = [
 ];
 
 const socialLinks = [
+  { label: "WhatsApp", displayName: "WhatsApp", href: "https://wa.me/447380313065" },
   { label: "Instagram", displayName: "Instagram", href: "#" },
   { label: "X", displayName: "X", href: "#" },
   { label: "LinkedIn", displayName: "LinkedIn", href: "#" },
@@ -162,6 +163,17 @@ const PlatformLogo = ({ label }: { label: string }) => {
 };
 
 const SocialLogo = ({ label }: { label: string }) => {
+  if (label === "WhatsApp") {
+    return (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M12 2a9.7 9.7 0 0 0-8.3 14.7L2.5 22l5.4-1.2A9.7 9.7 0 1 0 12 2Zm0 2a7.7 7.7 0 0 1 0 15.4c-1.3 0-2.5-.3-3.6-.9l-.3-.2-2.9.7.7-2.8-.2-.3A7.7 7.7 0 0 1 12 4Zm-3.4 3.9c-.2 0-.5.1-.7.4-.3.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.8 2.1.8 2.6.6 3.1.6.5 0 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.4l-1.7-.8c-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.2.2-.3.2-.6.1-.3-.1-1.1-.4-2.1-1.3-.8-.7-1.3-1.6-1.5-1.9-.2-.3 0-.4.1-.5l.4-.5c.1-.2.2-.3.3-.5.1-.2.1-.4 0-.5L9.7 8.4c-.2-.4-.4-.5-.6-.5h-.5Z"
+        />
+      </svg>
+    );
+  }
+
   if (label === "Instagram") {
     return (
       <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">

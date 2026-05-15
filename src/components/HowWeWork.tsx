@@ -106,7 +106,7 @@ const HowWeWork = () => {
           className="text-white font-display font-medium leading-[1.1] max-w-4xl"
           style={{ fontSize: "clamp(2.5rem, 5vw, 5rem)" }}
         >
-          I turn raw ideas into products that work and grow.
+          We turn raw ideas into products that work and grow.
         </h2>
         <div className="mt-20 w-[1px] h-32 border-l border-dashed border-[#2d5af1]/40" />
       </div>
